@@ -13,9 +13,9 @@ $eloquentBuilder = Model::where('product_id', 5)
     ->with('relation');
     
     //use a helper to paginate the query builder
-$total = PaginationHelper::handlePaginateGetCount($attendeeBuilder, $request->all()); 
+$total = PaginationHelper::handlePaginateGetCount($eloquentBuilder, $request->all()); 
 
-return response()->json(['items' => $attendeeBuilder->get(), 'total' => $total]);
+return response()->json(['items' => $eloquentBuilder->get(), 'total' => $total]);
 ````
 ````
 Each table only requires a 
