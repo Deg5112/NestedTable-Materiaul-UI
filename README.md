@@ -18,9 +18,16 @@ $total = PaginationHelper::handlePaginateGetCount($attendeeBuilder, $request->al
 return response()->json(['items' => $attendeeBuilder->get(), 'total' => $total]);
 ````
 ````
+Each table only requires a 
+1) configuration object
+2) pass the configured http/axios client from the app. (Maybe request require authorization, which is controlled by the http client's headers)
+ 
+and a ref if you want to search the remote database when a search value is set
+````
+````
 Example 1:
 
-Custom Action Buttons/callbacks, 
+Custom Action/Controls with custom React components
 custom data formatting, nested data (. dot) notation, with searchBar(not included), 
 sort specific columns, assign column to be sorted in a specific direction by default
 how to handle search with refs
@@ -63,7 +70,7 @@ import TfTable from 'tf_table/src/TfTable';
       },
       {
         header: 'Location',
-        prop: ['contact.mailingcity', 'contact.mailingstate'],
+        prop: ['relation.mailingcity', 'relation.mailingstate'],
         propValueFormat: (items) => `${items[0]}, ${items[1]}`,
       },
       {
@@ -102,9 +109,101 @@ import TfTable from 'tf_table/src/TfTable';
   innerRef={node => this.attendeeTable = node}
   config={this.tableConfig}
   axios={this.tfservicesAxios}
-  noResultsMessage={"No Attendees Found"}
+  noResultsMessage={"No Results Found"}
 />
 ````
 
+````
+Example 2:
 
+Nested Tables, editing columns in a row/db record in place. The table will save the record to the endpoint provided by the user
+Using Multiple built in Material UI Datagrid controls, with callback.
+````
+![Scheme](readme_images/OnDemand_Tom_Ferry.png)
+````
+Example 1 Code:
 
+this.videosConfig = {
+      tableHeaderRow: {
+        styleKey: 'tableHeadDarcula'
+      },
+      canEditExistingItems: true,
+      dataUrl: route('get-section-videos'),
+      columns: [
+        {
+          header: 'Title',
+          prop: 'title',
+          canEdit: false,
+          type: 'TextField'
+        },
+        {
+          header: 'Video Url',
+          prop: 'video_url',
+          canEdit: false,
+          type: 'TextField'
+        },
+        {
+          header: 'Live Stream Url',
+          prop: 'live_stream_url',
+          canEdit: true,
+          type: 'TextField'
+        },
+        {
+          header: '',
+          type: 'Action Save',
+          url: route('save-product-section-video')
+        },
+      ]
+    };
+
+    this.sectionConfig = {
+      tableHeaderRow: {
+        styleKey: 'tableHeadDarcula'
+      },
+      dataUrl: route('get-product-sections'),
+      columns: [
+        {
+          header: 'Videos',
+          expandableConfig: this.videosConfig,
+        },
+        {
+          header: 'Title',
+          prop: 'section',
+          canEdit: false,
+          type: 'input'
+        },
+      ]
+    }
+
+    this.tableConfig = {
+      tableHeaderRow: {
+        styleKey: 'tableHeadDarcula'
+      },
+      dataUrl: route('get-ondemand-products'),
+      columns: [
+        {
+          header: 'Sections',
+          expandableConfig: this.sectionConfig,
+        },
+        {
+          header: 'Name',
+          prop: 'name',
+          canEdit: false,
+          type: 'input'
+        },
+        {
+          header: 'Type',
+          prop: 'family',
+          canEdit: false,
+          type: 'input'
+        },
+      ]
+    }
+  }
+````
+````
+<TfTable 
+  config={this.tableConfig}
+  axios={this.tfservicesAxios} 
+/>
+````
