@@ -23,6 +23,9 @@ Each table only requires a
 2) pass the configured http/axios client from the app. (Maybe request require authorization, which is controlled by the http client's headers)
  
 and a ref if you want to search the remote database when a search value is set
+
+refs can be helpful for other use cases other than searching like refreshing the table before closing an external modal to save the record
+ie: this.table.refresh()
 ````
 ````
 Example 1:
@@ -37,8 +40,6 @@ how to handle search with refs
 Example 1 Code:
 
 import TfTable from 'tf_table/src/TfTable';
-
-
  constructor(props) {
   this.table = React.createRef();
   
