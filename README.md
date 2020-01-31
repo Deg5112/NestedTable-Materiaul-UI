@@ -1,10 +1,34 @@
 # tf_table
+This table is build with React + Material UI. And Server Side sorting/searching/pagination is a requirement.
 
-##Custom Action Buttons/callbacks, 
-##custom data formatting, nested data (. dot) notation, with searchBar(not included), 
-##sort specific columns, assign column to be sorted in a specific direction by default
-###how to handle search with refs
+The table will send send the server pagination GET parameters 'rowPerPage, page, search'
+it is the job of the backend to return a json response with response.items : [{}, {}] and response.total : Int
+
+
 ````
+example re-usable code with laravel eloquent
+
+$eloquentBuilder = Model::where('product_id', 5)
+    ->bySearch($request->get('search', null)) //have a method that will handle search fields for this model
+    ->with('relation');
+    
+    //use a helper to paginate the query builder
+$total = PaginationHelper::handlePaginateGetCount($attendeeBuilder, $request->all()); 
+
+return response()->json(['items' => $attendeeBuilder->get(), 'total' => $total]);
+````
+````
+Example 1:
+
+Custom Action Buttons/callbacks, 
+custom data formatting, nested data (. dot) notation, with searchBar(not included), 
+sort specific columns, assign column to be sorted in a specific direction by default
+how to handle search with refs
+````
+![Scheme](readme_images/table_with_custom_button_custom_text_format.png)
+````
+Example 1 Code:
+
 import TfTable from 'tf_table/src/TfTable';
 
 
@@ -81,6 +105,6 @@ import TfTable from 'tf_table/src/TfTable';
   noResultsMessage={"No Attendees Found"}
 />
 ````
-![Scheme](readme_images/table_with_custom_button_custom_text_format.png)
+
 
 
