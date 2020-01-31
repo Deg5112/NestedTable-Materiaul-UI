@@ -142,14 +142,18 @@ class TfTable extends React.Component {
       page: 0,
       rowsPerPage: 10,
       totalItems: 0,
-      orderBy: column
-        ? Array.isArray(column.prop)
-          ? column.prop[0]
-          : column.prop
-        : null,
+      orderBy: this.getOrderByForColumn(column),
       orderByDirection: column && column.initialSortOrderByDirection ? column.initialSortOrderByDirection : 'asc',
       sortedColumn: null,
     }
+  }
+
+  getOrderByForColumn(column) {
+    return column
+      ? Array.isArray(column.prop)
+        ? column.prop[0]
+        : column.prop
+      : null
   }
 
   resetPagination() {
@@ -327,7 +331,7 @@ class TfTable extends React.Component {
   }
 
   sortColumn(column) {
-    this.localPagination = {...this.localPagination, orderBy: column.prop, orderByDirection: this.getNewSortDirection()}
+    this.localPagination = {...this.localPagination, orderBy: this.getOrderByForColumn(column), orderByDirection: this.getNewSortDirection()}
     this.fetchItems()
   }
 
