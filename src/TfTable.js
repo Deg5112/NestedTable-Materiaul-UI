@@ -34,7 +34,7 @@ import moment from 'moment';
 class TfTable extends React.Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
-    axios: PropTypes.object.isRequired,
+    axios: PropTypes.func.isRequired,
     searchEnabled: PropTypes.bool,
     queryParams: PropTypes.object, //this would be to send up id as query param
   };
@@ -80,6 +80,12 @@ class TfTable extends React.Component {
       this.localQueryParams = newProps.queryParams;
       this.fetchItems();
     }
+  }
+
+  search(queryParams) {
+    this.resetPagination();
+    this.localQueryParams = queryParams;
+    this.fetchItems();
   }
 
   setInitialState() {
@@ -131,11 +137,16 @@ class TfTable extends React.Component {
   getDefaultPagination() {
     let column = this.getInitialSortColumn();
 
+
     return {
       page: 0,
       rowsPerPage: 10,
       totalItems: 0,
-      orderBy: column ? column.prop : null,
+      orderBy: column
+        ? Array.isArray(column.prop)
+          ? column.prop[0]
+          : column.prop
+        : null,
       orderByDirection: column && column.initialSortOrderByDirection ? column.initialSortOrderByDirection : 'asc',
       sortedColumn: null,
     }
@@ -157,8 +168,8 @@ class TfTable extends React.Component {
     this.fetchItems()
   }
 
-  refresh() {
-    this.fetchItems()
+  async refresh() {
+    return this.fetchItems()
   }
 
   getInitialSortColumn() {
@@ -192,6 +203,11 @@ class TfTable extends React.Component {
 
   handleChangePage(event, newPage) {
     this.localPagination = {...this.localPagination, page: newPage};
+
+    if (this.axios.killPreviousRequest) {
+      this.axios.killPreviousRequest();
+    }
+
     this.fetchItems()
   }
 
@@ -204,12 +220,12 @@ class TfTable extends React.Component {
     return ((typeof url === 'function') ? url(item) : url);
   }
 
-  fetchItems() {
+  async fetchItems() {
     const newQueryParamsForRequest = this.getNewQueryForRequest();
 
     this.setState({processing: true});
 
-    this.axios.get(this.localConfig.dataUrl, newQueryParamsForRequest, {showLoader: true, defaultErrorHandler: false})
+    return this.axios.get(this.localConfig.dataUrl, newQueryParamsForRequest, {showLoader: true, defaultErrorHandler: false})
       .then(({data}) => {
         this.localPagination = {...this.localPagination, totalItems: data.total};
 
@@ -456,7 +472,7 @@ class TfTable extends React.Component {
     else if (column.type === 'Custom') {
       return (
         <Fragment key={key}>
-          {column.render(item, column, classes, this.state.data)}
+          {column.render(item, column, classes)}
         </Fragment>
       );
     }
@@ -578,13 +594,38 @@ class TfTable extends React.Component {
   }
 
   getColumnValue(item, column) {
-    if (!column.prop) { return "" }
-    const props = column.prop.split(".");
-    const value = this.getValueRecursively(item, props);
-    return value ? value : ''
+    if (!column.prop) { return  "" }
+
+    if (Array.isArray(column.prop)) {
+      const values = [];
+
+      for(let prop of column.prop) {
+        const props = prop.split(".");
+        values.push(this.getNestedValue(item, props));
+      }
+
+      if (column.propValueFormat) {
+        return column.propValueFormat(values)
+      } else {
+        value = JSON.stringify(values)
+        value = value.replace('[', '');
+        value = value.replace(']', '');
+        value = value.replace(/"/g, '');
+        return value;
+      }
+    } else {
+      const props = column.prop.split(".");
+      const value = this.getNestedValue(item, props);
+
+      if (!value) {
+        return column.defaultPropValue ? column.defaultPropValue : "";
+      }
+
+      return value;
+    }
   }
 
-  getValueRecursively(item, props) {
+  getNestedValue(item, props) {
     let value = item;
     for(let prop of props) {
       value = value[prop]
@@ -913,6 +954,7 @@ export default withStyles((theme) => ({
     color: 'red'
   },
   container: {
+    width: '100%',
     overflowY: 'auto'
   },
   button: {
