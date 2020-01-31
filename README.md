@@ -121,85 +121,85 @@ Using Multiple built in Material UI Datagrid controls, with callback.
 ````
 ![Scheme](readme_images/OnDemand_Tom_Ferry.png)
 ````
-Example 1 Code:
+Example 2 Code:
 
 this.videosConfig = {
-      tableHeaderRow: {
-        styleKey: 'tableHeadDarcula'
-      },
-      canEditExistingItems: true,
-      dataUrl: route('get-section-videos'),
-      columns: [
-        {
-          header: 'Title',
-          prop: 'title',
-          canEdit: false,
-          type: 'TextField'
-        },
-        {
-          header: 'Video Url',
-          prop: 'video_url',
-          canEdit: false,
-          type: 'TextField'
-        },
-        {
-          header: 'Live Stream Url',
-          prop: 'live_stream_url',
-          canEdit: true,
-          type: 'TextField'
-        },
-        {
-          header: '',
-          type: 'Action Save',
-          url: route('save-product-section-video')
-        },
-      ]
-    };
+  tableHeaderRow: {
+    styleKey: 'tableHeadDarcula'
+  },
+  canEditExistingItems: true,
+  dataUrl: route('get-section-videos'),
+  columns: [
+    {
+      header: 'Title',
+      prop: 'title',
+      canEdit: false,
+      type: 'TextField'
+    },
+    {
+      header: 'Video Url',
+      prop: 'video_url',
+      canEdit: false,
+      type: 'TextField'
+    },
+    {
+      header: 'Live Stream Url',
+      prop: 'live_stream_url',
+      canEdit: true,
+      type: 'TextField'
+    },
+    {
+      header: '',
+      type: 'Action Save',
+      url: route('save-product-section-video')
+    },
+  ]
+};
 
-    this.sectionConfig = {
-      tableHeaderRow: {
-        styleKey: 'tableHeadDarcula'
-      },
-      dataUrl: route('get-product-sections'),
-      columns: [
-        {
-          header: 'Videos',
-          expandableConfig: this.videosConfig,
-        },
-        {
-          header: 'Title',
-          prop: 'section',
-          canEdit: false,
-          type: 'input'
-        },
-      ]
-    }
+this.sectionConfig = {
+  tableHeaderRow: {
+    styleKey: 'tableHeadDarcula'
+  },
+  dataUrl: route('get-product-sections'),
+  columns: [
+    {
+      header: 'Videos',
+      expandableConfig: this.videosConfig,
+    },
+    {
+      header: 'Title',
+      prop: 'section',
+      canEdit: false,
+      type: 'input'
+    },
+  ]
+}
 
-    this.tableConfig = {
-      tableHeaderRow: {
-        styleKey: 'tableHeadDarcula'
-      },
-      dataUrl: route('get-ondemand-products'),
-      columns: [
-        {
-          header: 'Sections',
-          expandableConfig: this.sectionConfig,
-        },
-        {
-          header: 'Name',
-          prop: 'name',
-          canEdit: false,
-          type: 'input'
-        },
-        {
-          header: 'Type',
-          prop: 'family',
-          canEdit: false,
-          type: 'input'
-        },
-      ]
-    }
-  }
+this.tableConfig = {
+  tableHeaderRow: {
+    styleKey: 'tableHeadDarcula'
+  },
+  dataUrl: route('get-ondemand-products'),
+  columns: [
+    {
+      header: 'Sections',
+      expandableConfig: this.sectionConfig,
+    },
+    {
+      header: 'Name',
+      prop: 'name',
+      canEdit: false,
+      type: 'input'
+    },
+    {
+      header: 'Type',
+      prop: 'family',
+      canEdit: false,
+      type: 'input'
+    },
+  ]
+}
+}
 ````
 ````
 <TfTable 
