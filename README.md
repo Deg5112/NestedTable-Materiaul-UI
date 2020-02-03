@@ -202,6 +202,29 @@ this.tableConfig = {
 }
 }
 ````
+
+````
+Example 3
+
+Dynamic URL. URL can be generated per item specific params.
+Just declare it as a function with "item" param passed in.
+````
+
+````
+Example 3 code
+
+columns: [
+  {
+    header: 'Title',
+    prop: 'title',
+    canEdit: true,
+    type: 'ClickToEdit',
+    url: (item) => route('sharefile-rename', {file: item.id}),
+    onSuccess: (data) => reactComponentInstance.notify.success('File title has been renamed.')
+  },
+]
+````
+
 ````
 <TfTable 
   config={this.tableConfig}
