@@ -396,7 +396,7 @@ class TfTable extends React.Component {
     return (
       <TableRow>
         <TablePagination
-          rowsPerPageOptions={[10, 25, 50, 100]}
+          rowsPerPageOptions={[10, 25, 50, 100, 1000]}
           colSpan={this.getColumnCount()}
           count={totalItems}
           rowsPerPage={rowsPerPage}
@@ -474,9 +474,13 @@ class TfTable extends React.Component {
       )
     }
     else if (column.type === 'Custom') {
+      const customElOptions = {
+        disabled: !this.isNewItem(item) && !this.columnIsBeingEdited(column, item),
+        updateItemProp: (item, column, value) => this.updateItemProp(item, column, value)
+      }
       return (
         <Fragment key={key}>
-          {column.render(item, column, classes)}
+          {column.render(item, column, classes, customElOptions)}
         </Fragment>
       );
     }
@@ -625,7 +629,9 @@ class TfTable extends React.Component {
         return column.defaultPropValue ? column.defaultPropValue : "";
       }
 
-      return value;
+      return column.propValueFormat
+        ? column.propValueFormat(value)
+        : value;
     }
   }
 
@@ -663,8 +669,7 @@ class TfTable extends React.Component {
   }
 
   leaveItemEditState(event, item) {
-    if (event)
-      event.stopPropagation();
+    if (event) { event.stopPropagation(); }
 
     if (this.axios.isProcessing()) { return }
 
@@ -685,7 +690,7 @@ class TfTable extends React.Component {
       }
     }
 
-    return new Promise(resolve => this.setState({items: items}, resolve));
+    return new Promise(resolve => this.setState({items}, resolve));
   }
 
   saveRecord(event, url, item, options) {
