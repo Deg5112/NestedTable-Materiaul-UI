@@ -514,7 +514,6 @@ class TfTable extends React.Component {
         return (
           <TextField
             required={column.required ? column.required : false}
-            id="standard-name"
             className={classes.textField}
             value={this.getColumnValue(item, column)}
             margin="normal"
