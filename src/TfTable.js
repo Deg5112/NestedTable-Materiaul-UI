@@ -888,6 +888,21 @@ class TfTable extends React.Component {
     return 'tableHead'
   }
 
+  getTableContainerStylesKey() {
+    if (this.localConfig.tableContainer && this.localConfig.tableContainer.style) {
+      return ''
+    }
+
+    return 'container'
+  }
+
+  getTableContainerStyle() {
+    if (this.localConfig.tableContainer && this.localConfig.tableContainer.style) {
+      return this.localConfig.tableContainer.style;
+    }
+    return {}
+  }
+
   render() {
     const { classes, headers } = this.props;
     const { items } = this.state;
@@ -895,7 +910,7 @@ class TfTable extends React.Component {
     const {page, rowsPerPage, totalItems} = this.localPagination;
 
     return (
-      <Grid container className={classes.container}>
+      <Grid container style={this.getTableContainerStyle()} className={classes[this.getTableContainerStylesKey()]}>
         <Grid container justify="flex-end">
           {
             canAddItems &&
