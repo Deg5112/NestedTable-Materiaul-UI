@@ -717,7 +717,7 @@ class TfTable extends React.Component {
           options.onSuccess(data);
         }
         else {
-        	if (this.props.notify && this.props.notify.success('Item Saved', data))
+        	this.props.notify && this.props.notify.success('Item Saved', data)
         }
 
         if (this.localConfig.callbacks.onAddItem) { this.localConfig.callbacks.onAddItem(item) }
@@ -800,7 +800,7 @@ class TfTable extends React.Component {
 
     this.axios.delete(url, {data: {item: item}})
       .then(({data}) => {
-      	if (this.props.notify && this.props.notify.success('Item Deleted', data))
+      	this.props.notify && this.props.notify.success('Item Deleted', data)
         
         if (this.localConfig.callbacks.onDeleteItem) { this.localConfig.callbacks.onDeleteItem(item) }
         this.onDeleteRecord(item);
