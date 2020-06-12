@@ -233,7 +233,14 @@ class TfTable extends React.Component {
       .then(({data}) => {
         this.localPagination = {...this.localPagination, totalItems: data.total};
 
-        if (this.isFirstPage() && data[this.localConfig.keyName].length === 0 && this.localConfig.showNoResultsMessage === true) { this.notify.error('No records found')}
+        if (
+        	this.isFirstPage() 
+	        && data[this.localConfig.keyName].length === 0 
+	        && this.localConfig.showNoResultsMessage === true
+	        && this.props.notify
+        ) {
+        	this.props.notify.error('No records found')
+        }
 
         this.setState({items: data[this.localConfig.keyName], expandableToggleMap: this.getExpandableToggleMap(data[this.localConfig.keyName]), data: data});
 
@@ -710,7 +717,7 @@ class TfTable extends React.Component {
           options.onSuccess(data);
         }
         else {
-          this.notify.success('Item Saved', data);
+        	if (this.props.notify && this.props.notify.success('Item Saved', data))
         }
 
         if (this.localConfig.callbacks.onAddItem) { this.localConfig.callbacks.onAddItem(item) }
@@ -793,7 +800,8 @@ class TfTable extends React.Component {
 
     this.axios.delete(url, {data: {item: item}})
       .then(({data}) => {
-        this.notify.success('Item Deleted', data);
+      	if (this.props.notify && this.props.notify.success('Item Deleted', data))
+        
         if (this.localConfig.callbacks.onDeleteItem) { this.localConfig.callbacks.onDeleteItem(item) }
         this.onDeleteRecord(item);
       })
