@@ -172,7 +172,7 @@ class TfTable extends React.Component {
     this.fetchItems()
   }
 
-  async refresh() {
+  refresh() {
     return this.fetchItems()
   }
 
@@ -224,7 +224,7 @@ class TfTable extends React.Component {
     return ((typeof url === 'function') ? url(item) : url);
   }
 
-  async fetchItems() {
+  fetchItems() {
     const newQueryParamsForRequest = this.getNewQueryForRequest();
 
     this.setState({processing: true});
