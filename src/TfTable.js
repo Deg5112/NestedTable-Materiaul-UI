@@ -13,7 +13,8 @@ import {
   TablePagination,
   TableRow,
   TableSortLabel,
-  TextField
+  TextField,
+	Button
 } from '@material-ui/core';
 
 import SvgMore from "@material-ui/icons/ExpandMore";
@@ -121,6 +122,7 @@ class TfTable extends React.Component {
       canAddItems: false,
       canEditExistingItems: false,
       canDeleteExistingItems: false,
+	    addItemButtonText: null,
       tableHeaderRow: {
         styleKey: 'tableHead'
       },
@@ -234,8 +236,8 @@ class TfTable extends React.Component {
         this.localPagination = {...this.localPagination, totalItems: data.total};
 
         if (
-        	this.isFirstPage() 
-	        && data[this.localConfig.keyName].length === 0 
+        	this.isFirstPage()
+	        && data[this.localConfig.keyName].length === 0
 	        && this.localConfig.showNoResultsMessage === true
 	        && this.props.notify
         ) {
@@ -389,7 +391,11 @@ class TfTable extends React.Component {
   getRowCells(item, classes) {
     return this.localConfig.columns.map((column, index) => (
       <TableCell
-        align="left"
+        align={
+        	column.type === 'Action Save' || column.type === 'Action Delete' 
+	          ? 'center'
+		        : 'left'
+        }
         style={column.style ? column.style : {}}
         className={classes.tableCell}
         key={this.addRowColumnKey(item, index)}
@@ -578,7 +584,11 @@ class TfTable extends React.Component {
   canDeleteItem(item) {
     if (this.isNewItem(item)) { return true }
 
-    return this.localConfig.rules.canDeleteItem && this.localConfig.rules.canDeleteItem(item);
+    if (!this.localConfig.rules.canDeleteItem) {
+    	return true;
+    }
+
+    return this.localConfig.rules.canDeleteItem(item);
   }
 
   canEditItem(item) {
@@ -801,7 +811,7 @@ class TfTable extends React.Component {
     this.axios.delete(url, {data: {item: item}})
       .then(({data}) => {
       	this.props.notify && this.props.notify.success('Item Deleted', data)
-        
+
         if (this.localConfig.callbacks.onDeleteItem) { this.localConfig.callbacks.onDeleteItem(item) }
         this.onDeleteRecord(item);
       })
@@ -911,6 +921,35 @@ class TfTable extends React.Component {
     return {}
   }
 
+  getAddItemsButton() {
+  	let button = null;
+
+  	if (this.localConfig.addItemButtonText) {
+  	  	button = (
+			    <Button
+				    variant="contained"
+				    color="primary"
+				    style={{textTransform: 'capitalize'}}
+				    onClick={(data) => this.createItem()}
+			    >
+				    {this.localConfig.addItemButtonText}
+			    </Button>
+		    )
+	  } else {
+		  button = (
+			  <IconButton
+				  size="medium"
+				  color="primary"
+				  onClick={(data) => this.createItem()}
+			  >
+				  <Add />
+			  </IconButton>
+		  )
+	  }
+
+  	return button;
+  }
+
   render() {
     const { classes, headers } = this.props;
     const { items } = this.state;
@@ -921,8 +960,7 @@ class TfTable extends React.Component {
       <Grid container style={this.getTableContainerStyle()} className={classes[this.getTableContainerStylesKey()]}>
         <Grid container justify="flex-end">
           {
-            canAddItems &&
-            <IconButton size="medium" color="primary" onClick={(data) => this.createItem()}><Add /></IconButton>
+            canAddItems && this.getAddItemsButton()
           }
         </Grid>
         <Grid container>
