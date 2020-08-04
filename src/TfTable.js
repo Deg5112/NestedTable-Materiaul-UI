@@ -392,7 +392,7 @@ class TfTable extends React.Component {
     return this.localConfig.columns.map((column, index) => (
       <TableCell
         align={
-        	column.type === 'Action Save' || column.type === 'Action Delete' 
+        	column.type === 'Action Save' || column.type === 'Action Delete'
 	          ? 'center'
 		        : 'left'
         }
@@ -499,6 +499,14 @@ class TfTable extends React.Component {
     }
 
     return null;
+  }
+
+  getColumnByProp(prop) {
+    for (let column of this.localConfig.columns) {
+      if (column.prop === prop) {
+        return column;
+      }
+    }
   }
 
   getCellContent(item, column, classes) {
@@ -661,7 +669,8 @@ class TfTable extends React.Component {
   }
 
   updateItemProp(item, column, value) {
-    return this.updateItem(this.mergeDeep(item, this.getNewItemColumn(column, value)));
+    let newItem = this.mergeDeep(item, this.getNewItemColumn(column, value));
+    return this.updateItem(newItem);
   }
 
   getNewItemColumn(column, value = null) {
@@ -709,11 +718,26 @@ class TfTable extends React.Component {
     return new Promise(resolve => this.setState({items}, resolve));
   }
 
-  saveRecord(event, url, item, options) {
-    if (event)
-      event.stopPropagation();
+  validateRecord(item) {
+    let validated = true;
 
+    for(let column of this.localConfig.columns) {
+      if (
+        column.required
+        && (!item[column.prop] || !item[column.prop] === "")
+      ) {
+        this.props.notify.error(`Missing field: ${column.header}`)
+        validated = false;
+      }
+    }
+
+    return validated;
+  }
+
+  saveRecord(event, url, item, options) {
+    if (event) { event.stopPropagation(); }
     if (this.axios.isProcessing()) { return }
+    if (!this.validateRecord(item)) { return }
 
     this.setState({processing: true});
 
