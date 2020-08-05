@@ -722,9 +722,16 @@ class TfTable extends React.Component {
     let validated = true;
 
     for(let column of this.localConfig.columns) {
+	    if (!column.prop) {
+		    continue;
+	    }
+
+	    const props = column.prop.split(".");
+	    const value = this.getNestedValue(item, props);
+
       if (
         column.required
-        && (!item[column.prop] || !item[column.prop] === "")
+        && (!value || value === "")
       ) {
         this.props.notify.error(`Missing field: ${column.header}`)
         validated = false;
