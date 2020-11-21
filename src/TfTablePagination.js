@@ -4,15 +4,15 @@ import FirstPageIcon from '@material-ui/icons/FirstPage';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import LastPageIcon from '@material-ui/icons/LastPage';
-import BaseTfComponent from "reactSrc/components/base/BaseTfservicesComponent";
-import tfConnect from "reactSrc/store/connect/tfservicesConnect";
+import {withStyles} from "@material-ui/core";
+import PropTypes from "prop-types";
 
-class TablePaginationActions extends BaseTfComponent {
+class TablePaginationActions extends React.Component {
   static propTypes = {
-    count: TablePaginationActions.TfservicesPropTypes.number.isRequired,
-    onChangePage: TablePaginationActions.TfservicesPropTypes.func.isRequired,
-    page: TablePaginationActions.TfservicesPropTypes.number.isRequired,
-    rowsPerPage: TablePaginationActions.TfservicesPropTypes.number.isRequired,
+    count: PropTypes.number.isRequired,
+    onChangePage: PropTypes.func.isRequired,
+    page: PropTypes.number.isRequired,
+    rowsPerPage: PropTypes.number.isRequired,
   };
 
   constructor(props) {
@@ -70,14 +70,13 @@ class TablePaginationActions extends BaseTfComponent {
   }
 }
 
-export default tfConnect({
-  component: TablePaginationActions,
-  styles: theme => ({
-    paginationActions: {
-      flexShrink: 0,
-      color: theme.palette.text.secondary,
-      marginLeft: 5,
-    },
-    direction: theme.direction,
-  })
-})
+
+export default withStyles((theme) => ({
+  paginationActions: {
+    flexShrink: 0,
+    color: theme.palette.text.secondary,
+    marginLeft: 5,
+  },
+  direction: theme.direction,
+}))(TablePaginationActions)
+

@@ -139,7 +139,6 @@ class TfTable extends React.Component {
   getDefaultPagination() {
     let column = this.getInitialSortColumn();
 
-
     return {
       page: 0,
       rowsPerPage: 10,
@@ -351,25 +350,27 @@ class TfTable extends React.Component {
   getRows({ items, classes }) {
     let expandableColumn = this.getExpandableColumn(this.localConfig.columns);
 
+    let expandableConfig = null;
+    if (expandableColumn) {
+       expandableConfig = {...expandableColumn.expandableConfig};
+    }
+
     return items.slice().map(item => (
       <Fragment key={this.addRowKey(item)}>
         <TableRow>
           {this.getRowCells(item, classes)}
         </TableRow>
         {
+          expandableConfig &&
           this.state.expandableToggleMap[item.id] &&
-          this.getExpandableTable(expandableColumn.expandableConfig, item)
+          this.getExpandableTable(expandableConfig, item)
         }
       </Fragment>
     ))
   }
 
   getExpandableTable(config, item) {
-    if(typeof config.dataUrl === 'string' && /\d/.test(config.dataUrl) && item) {
-      config.dataUrl = config.dataUrl.replace(/\d+/g, item.id)
-    }
-
-    config.dataUrl = this.getUrl(config.dataUrl, item);
+    config.dataUrl = this.getUrl(config.dataUrl, item)
 
     return (
       <TableRow>
