@@ -37,12 +37,16 @@ class TfTable extends React.Component {
     config: PropTypes.object.isRequired,
     axios: PropTypes.func.isRequired,
     searchEnabled: PropTypes.bool,
+    cachedPagination: PropTypes.object,
+    cachedState: PropTypes.object,
     queryParams: PropTypes.object, //this would be to send up id as query param
   };
 
   static defaultProps = {
     rowsPerPage: 5,
     queryParams: {},
+    cachedPagination: null,
+    cachedState: null,
   };
 
   constructor(props) {
@@ -91,10 +95,13 @@ class TfTable extends React.Component {
 
   setInitialState() {
     this.state = {
-      items: [],
-      redirectBack: false,
-      expandableToggleMap: {},
-      processing: false
+      ...{
+        items: [],
+        redirectBack: false,
+        expandableToggleMap: {},
+        processing: false
+      },
+      ...this.props.cachedState //app is responsible for saving this in redux and passing down
     }
   }
 
@@ -140,12 +147,15 @@ class TfTable extends React.Component {
     let column = this.getInitialSortColumn();
 
     return {
-      page: 0,
-      rowsPerPage: 10,
-      totalItems: 0,
-      orderBy: this.getOrderByForColumn(column),
-      orderByDirection: column && column.initialSortOrderByDirection ? column.initialSortOrderByDirection : 'asc',
-      sortedColumn: null,
+      ...{
+        page: 0,
+        rowsPerPage: 10,
+        totalItems: 0,
+        orderBy: this.getOrderByForColumn(column),
+        orderByDirection: column && column.initialSortOrderByDirection ? column.initialSortOrderByDirection : 'asc',
+        sortedColumn: null,
+      },
+      ...this.props.cachedPagination
     }
   }
 
@@ -170,7 +180,9 @@ class TfTable extends React.Component {
   }
 
   componentDidMount() {
-    this.fetchItems()
+    if (!this.props.cachedPagination) {
+      this.fetchItems()
+    }
   }
 
   refresh() {
@@ -240,12 +252,20 @@ class TfTable extends React.Component {
 	        && this.localConfig.showNoResultsMessage === true
 	        && this.props.notify
         ) {
-        	this.props.notify.error('No records found')
+        	this.props.notify.info('No records found')
         }
 
-        this.setState({items: data[this.localConfig.keyName], expandableToggleMap: this.getExpandableToggleMap(data[this.localConfig.keyName]), data: data});
-
-        if (this.localConfig.callbacks.onFetchItems) { this.localConfig.callbacks.onFetchItems(data) }
+        this.setState(
+          {
+            items: data[this.localConfig.keyName],
+            expandableToggleMap: this.getExpandableToggleMap(data[this.localConfig.keyName]),
+            data
+          },
+          () => {
+            if (this.localConfig.callbacks.onFetchItems) {
+              this.localConfig.callbacks.onFetchItems(data, {pagination: this.localPagination, state: this.state})
+            }
+          });
       })
       .catch(err => {
         console.log(err)
@@ -372,11 +392,15 @@ class TfTable extends React.Component {
   getExpandableTable(config, item) {
     config.dataUrl = this.getUrl(config.dataUrl, item)
 
+    const {axios, notify, classes} = this.props;
+
     return (
       <TableRow>
         <TableCell colSpan="12" style={{paddingLeft: '10%'}}>
           <TfTable
-            {...this.props}
+            classes={classes}
+            axios={axios}
+            notify={notify}
             config={config}
             queryParams={{id: item.id}}
           />
