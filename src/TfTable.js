@@ -728,8 +728,8 @@ class TfTable extends React.Component {
     this.updateItem(item);
   }
 
-  updateNestedItem(item) {
-    let nestedTable = this.state.expandableToggleMap[item.id];
+  updateNestedItem(item, parentId) {
+    let nestedTable = this.state.expandableToggleMap[parentId];
 
     if(nestedTable) {
       nestedTable.current.updateItem(item);
