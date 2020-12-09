@@ -652,7 +652,7 @@ class TfTable extends React.Component {
   }
 
   getColumnValue(item, column) {
-    if (!column.prop) { return  "" }
+    if (!column.prop && column.prop !== 0) { return  "" }
 
     if (Array.isArray(column.prop)) {
       const values = [];
