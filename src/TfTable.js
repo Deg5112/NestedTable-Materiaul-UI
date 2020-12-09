@@ -652,7 +652,7 @@ class TfTable extends React.Component {
   }
 
   getColumnValue(item, column) {
-    if (!column.prop && column.prop !== 0) { return  "" }
+    if (!column.prop) { return  "" }
 
     if (Array.isArray(column.prop)) {
       const values = [];
@@ -675,7 +675,7 @@ class TfTable extends React.Component {
       const props = column.prop.split(".");
       const value = this.getNestedValue(item, props);
 
-      if (!value) {
+      if (!value && value !== 0) {
         return column.defaultPropValue ? column.defaultPropValue : "";
       }
 
