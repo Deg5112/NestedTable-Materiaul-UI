@@ -393,11 +393,13 @@ class TfTable extends React.Component {
     config.dataUrl = this.getUrl(config.dataUrl, item)
 
     const {axios, notify, classes} = this.props;
+    const tableRef = this.state.expandableToggleMap[item.id];
 
     return (
       <TableRow>
         <TableCell colSpan="12" style={{paddingLeft: '10%'}}>
           <TfTable
+            ref={tableRef}
             classes={classes}
             axios={axios}
             notify={notify}
@@ -536,15 +538,14 @@ class TfTable extends React.Component {
 
   getCellContent(item, column, classes) {
     if (column.hasOwnProperty('expandableConfig') && this.canExpandItem(item)) {
-      return (<IconButton onClick={(data) => {
-        let itemId = this.state.expandableToggleMap[item.id] ? 0 : item.id;
-        this.handleExpand(itemId);
-      }}>
-        {
-          this.state.expandableToggleMap[item.id] ?
-            <SvgLess/>
-            : <SvgMore/>
-        }
+      return (
+        <IconButton
+          onClick={(data) => {
+            let itemId = this.state.expandableToggleMap[item.id] ? 0 : item.id;
+            this.handleExpand(itemId);
+          }}
+        >
+        { this.state.expandableToggleMap[item.id] ? <SvgLess/> : <SvgMore/> }
       </IconButton>)
     }
     else {
@@ -725,6 +726,14 @@ class TfTable extends React.Component {
 
     item.isEditing = false;
     this.updateItem(item);
+  }
+
+  updateNestedItem(item) {
+    let nestedTable = this.state.expandableToggleMap[item.id];
+
+    if(nestedTable) {
+      nestedTable.current.updateItem(item);
+    }
   }
 
   updateItem(item) {
@@ -949,7 +958,12 @@ class TfTable extends React.Component {
 
   handleExpand(id) {
     const expandableToggleMap = {...this.expandableToggleMap};
-    expandableToggleMap[id] = !expandableToggleMap[id];
+
+    if (expandableToggleMap[id]) {
+      expandableToggleMap[id] = false;
+    } else {
+      expandableToggleMap[id] = React.createRef();
+    }
 
     this.setState({expandableToggleMap: expandableToggleMap});
   }
