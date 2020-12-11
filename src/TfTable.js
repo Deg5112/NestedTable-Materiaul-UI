@@ -29,6 +29,7 @@ import Edit from '@material-ui/icons/Edit';
 import { withStyles } from "@material-ui/core/styles";
 import TfTablePagination from "./TfTablePagination";
 import TfEditableCell from "./TfEditableCell";
+import TfTableProgress from "./TfTableProgress";
 
 import moment from 'moment';
 
@@ -414,6 +415,23 @@ class TfTable extends React.Component {
         <TableRow>
           {this.getRowCells(item, classes)}
         </TableRow>
+        {
+          item.tfTableProgress > 0 &&
+          (
+              <TableRow>
+                <TableCell
+                    colspan={this.localConfig.columns.length}
+                    style={{
+                      border: '0',
+                    }}
+                    className={classes.tableCellProgressBar}
+                >
+                  <TfTableProgress completed={item.tfTableProgress} height={3}>
+                  </TfTableProgress>
+                </TableCell>
+              </TableRow>
+          )
+        }
         {
           expandableConfig &&
           this.state.expandableToggleMap[item.id] &&
@@ -1094,6 +1112,9 @@ export default withStyles((theme) => ({
   },
   tableCell: {
     padding: '0.5% 2% 0.5% 1%'
+  },
+  tableCellProgressBar: {
+    padding: '0 0 0 0 !important'
   },
   moreVert: {
     color: 'darkgray',
