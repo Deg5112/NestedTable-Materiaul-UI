@@ -130,7 +130,7 @@ class TfTable extends React.Component {
       canEditExistingItems: false,
       canDeleteExistingItems: false,
 	    addItemButtonText: null,
-      tableHeaderRow: {
+      tableHeaderColumn: {
         styleKey: 'tableHead'
       },
       keyName: 'items',
@@ -310,13 +310,50 @@ class TfTable extends React.Component {
     return (<TableRow>{headerRowCells}</TableRow>)
   }
 
+  getDefaultHeaderColumnStyle() {
+    let defaultStyles = {
+        tableHeadDarcula: {
+          backgroundColor: '#023c60',
+          color: 'white',
+          padding: '0.5% 2% 0.5% 1%'
+        },
+        tableHead: {
+          backgroundColor: 'white',
+          color: 'black',
+          padding: '0.5% 2% 0.5% 1%',
+          fontSize: '1rem'
+        }
+    }
+
+    return defaultStyles[this.getTableHeaderColumnStylesKey()];
+  }
+
+  getDefaultIconStyle() {
+    if (this.getTableHeaderColumnStylesKey() === 'tableHeadDarcula') {
+      return {color: `white !important`}
+    }
+
+    return {}
+  }
+
   getHeaderRowCells(classes) {
     const {orderByDirection, orderBy} = this.localPagination;
-    let style = {color: this.getTableHeaderRowStylesKey() === 'tableHeadDarcula' ? 'white' : 'black'};
 
-    if (this.localConfig.tableHeaderColumn && this.localConfig.tableHeaderColumn.style) {
-      style = this.localConfig.tableHeaderColumn.style;
+    let style = this.getDefaultHeaderColumnStyle();
+    let iconStyle = this.getDefaultIconStyle();
+    const {tableHeaderColumn} = this.localConfig;
+
+    if (tableHeaderColumn) {
+      if (tableHeaderColumn.style) { style = this.localConfig.tableHeaderColumn.style; }
+
+      if (tableHeaderColumn.iconStyle) {
+        iconStyle = {...tableHeaderColumn.iconStyle}
+
+        if (iconStyle.color) { iconStyle.color = `${iconStyle.color} !important`; }
+      }
     }
+
+    const StyledTableSortLabel = withStyles({icon: iconStyle})(TableSortLabel);
 
     return this.localConfig.columns.map((column, index) => (
         column.sort === true
@@ -325,18 +362,16 @@ class TfTable extends React.Component {
               align={'left'}
               key={this.iterateKey(column)}
               style={style}
-              className={classes[this.getTableHeaderRowStylesKey()]}
               sortDirection={orderByDirection}
             >
-              <TableSortLabel
+              <StyledTableSortLabel
                 style={style}
-                className={classes[this.getTableHeaderRowStylesKey()]}
                 active={orderBy !== null && orderBy === column.prop}
                 direction={orderByDirection}
                 onClick={() => this.sortColumn(column)}
               >
                 {column.header}
-              </TableSortLabel>
+              </StyledTableSortLabel>
             </TableCell>
           )
           : (
@@ -344,7 +379,6 @@ class TfTable extends React.Component {
               align={'left'}
               key={this.iterateKey(column)}
               style={style}
-              className={classes[this.getTableHeaderRowStylesKey()]}
             >
               {column.header}
             </TableCell>
@@ -968,9 +1002,9 @@ class TfTable extends React.Component {
     this.setState({expandableToggleMap: expandableToggleMap});
   }
 
-  getTableHeaderRowStylesKey() {
-    if (this.localConfig.tableHeaderRow && this.localConfig.tableHeaderRow.styleKey) {
-      return this.localConfig.tableHeaderRow.styleKey
+  getTableHeaderColumnStylesKey() {
+    if (this.localConfig.tableHeaderColumn && this.localConfig.tableHeaderColumn.styleKey) {
+      return this.localConfig.tableHeaderColumn.styleKey
     }
 
     return 'tableHead'
@@ -1035,7 +1069,7 @@ class TfTable extends React.Component {
         </Grid>
         <Grid container>
           <Table className={classes.table}>
-            <TableHead className={classes[this.getTableHeaderRowStylesKey()]}>
+            <TableHead>
               {this.getHeaderRow(classes)}
             </TableHead>
             <TableBody>
@@ -1057,17 +1091,6 @@ class TfTable extends React.Component {
 export default withStyles((theme) => ({
   table: {
     minWidth: 500,
-  },
-  tableHeadDarcula: {
-    backgroundColor: '#023c60',
-    color: 'white',
-    padding: '0.5% 2% 0.5% 1%'
-  },
-  tableHead: {
-    backgroundColor: 'white',
-    color: 'black',
-    padding: '0.5% 2% 0.5% 1%',
-    fontSize: '1rem'
   },
   tableCell: {
     padding: '0.5% 2% 0.5% 1%'
