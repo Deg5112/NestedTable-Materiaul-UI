@@ -14,7 +14,7 @@ import {
   TableRow,
   TableSortLabel,
   TextField,
-	Button
+  Button
 } from '@material-ui/core';
 
 import SvgMore from "@material-ui/icons/ExpandMore";
@@ -130,7 +130,7 @@ class TfTable extends React.Component {
       canAddItems: false,
       canEditExistingItems: false,
       canDeleteExistingItems: false,
-	    addItemButtonText: null,
+      addItemButtonText: null,
       tableHeaderColumn: {
         styleKey: 'tableHead'
       },
@@ -188,6 +188,14 @@ class TfTable extends React.Component {
 
   refresh() {
     return this.fetchItems()
+  }
+
+  refreshNestedTable(parentId) {
+    let nestedTable = this.state.expandableToggleMap[parentId];
+
+    if(nestedTable) {
+      nestedTable.current.refresh();
+    }
   }
 
   getInitialSortColumn() {
@@ -313,17 +321,17 @@ class TfTable extends React.Component {
 
   getDefaultHeaderColumnStyle() {
     let defaultStyles = {
-        tableHeadDarcula: {
-          backgroundColor: '#023c60',
-          color: 'white',
-          padding: '0.5% 2% 0.5% 1%'
-        },
-        tableHead: {
-          backgroundColor: 'white',
-          color: 'black',
-          padding: '0.5% 2% 0.5% 1%',
-          fontSize: '1rem'
-        }
+      tableHeadDarcula: {
+        backgroundColor: '#023c60',
+        color: 'white',
+        padding: '0.5% 2% 0.5% 1%'
+      },
+      tableHead: {
+        backgroundColor: 'white',
+        color: 'black',
+        padding: '0.5% 2% 0.5% 1%',
+        fontSize: '1rem'
+      }
     }
 
     return defaultStyles[this.getTableHeaderColumnStylesKey()];
@@ -407,7 +415,7 @@ class TfTable extends React.Component {
 
     let expandableConfig = null;
     if (expandableColumn) {
-       expandableConfig = {...expandableColumn.expandableConfig};
+      expandableConfig = {...expandableColumn.expandableConfig};
     }
 
     return items.slice().map(item => (
@@ -420,7 +428,7 @@ class TfTable extends React.Component {
           (
               <TableRow>
                 <TableCell
-                    colspan={this.localConfig.columns.length}
+                    colSpan={this.localConfig.columns.length}
                     style={{
                       border: '0',
                     }}
@@ -671,7 +679,7 @@ class TfTable extends React.Component {
     if (this.isNewItem(item)) { return true }
 
     if (!this.localConfig.rules.canDeleteItem) {
-    	return true;
+      return true;
     }
 
     return this.localConfig.rules.canDeleteItem(item);
@@ -796,7 +804,7 @@ class TfTable extends React.Component {
     } else {
       for(let i = 0; i < items.length; i++) {
         if (items[i].id === item.id) {
-          items[i] = item;
+          items[i] = {...items[i], ...item};
         }
       }
     }
@@ -808,12 +816,12 @@ class TfTable extends React.Component {
     let validated = true;
 
     for(let column of this.localConfig.columns) {
-	    if (!column.prop) {
-		    continue;
-	    }
+      if (!column.prop) {
+        continue;
+      }
 
-	    const props = column.prop.split(".");
-	    const value = this.getNestedValue(item, props);
+      const props = column.prop.split(".");
+      const value = this.getNestedValue(item, props);
 
       if (
         column.required
@@ -1044,32 +1052,32 @@ class TfTable extends React.Component {
   }
 
   getAddItemsButton() {
-  	let button = null;
+    let button = null;
 
-  	if (this.localConfig.addItemButtonText) {
-  	  	button = (
-			    <Button
-				    variant="contained"
-				    color="primary"
-				    style={{textTransform: 'capitalize'}}
-				    onClick={(data) => this.createItem()}
-			    >
-				    {this.localConfig.addItemButtonText}
-			    </Button>
-		    )
-	  } else {
-		  button = (
-			  <IconButton
-				  size="medium"
-				  color="primary"
-				  onClick={(data) => this.createItem()}
-			  >
-				  <Add />
-			  </IconButton>
-		  )
-	  }
+    if (this.localConfig.addItemButtonText) {
+      button = (
+          <Button
+              variant="contained"
+              color="primary"
+              style={{textTransform: 'capitalize'}}
+              onClick={(data) => this.createItem()}
+          >
+            {this.localConfig.addItemButtonText}
+          </Button>
+      )
+    } else {
+      button = (
+          <IconButton
+              size="medium"
+              color="primary"
+              onClick={(data) => this.createItem()}
+          >
+            <Add />
+          </IconButton>
+      )
+    }
 
-  	return button;
+    return button;
   }
 
   render() {
