@@ -125,6 +125,7 @@ class TfTable extends React.Component {
   getDefaultConfig() {
     return {
       showNoResultsMessage: true,
+      noResultsMessage: 'No records found',
       rules: {},
       callbacks: {},
       canAddItems: false,
@@ -261,7 +262,7 @@ class TfTable extends React.Component {
 	        && this.localConfig.showNoResultsMessage === true
 	        && this.props.notify
         ) {
-        	this.props.notify.info('No records found')
+        	this.props.notify.info(this.localConfig.noResultsMessage)
         }
 
         this.setState(
