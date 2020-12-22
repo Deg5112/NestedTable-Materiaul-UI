@@ -526,7 +526,7 @@ class TfTable extends React.Component {
           <React.Fragment key={key}>
             <IconButton
               className={classes.saveButton}
-              onClick={(event) => this.saveRecord(event, url, item)}
+              onClick={(event) => this.saveRecord(event, url, item, column)}
             >
               <Save />
             </IconButton>
@@ -641,7 +641,7 @@ class TfTable extends React.Component {
                 endEditing={(value, toUpdate) => {
                   if (!toUpdate) return;
                   this.updateItemProp(item, column, value)
-                    .then(() => this.saveRecord(null, url, item, {onSuccess: (data) => {
+                    .then(() => this.saveRecord(null, url, item, column, {onSuccess: (data) => {
                         typeof column.onSuccess === 'function' && column.onSuccess(data);
                       }}))
                 }}
@@ -836,7 +836,7 @@ class TfTable extends React.Component {
     return validated;
   }
 
-  saveRecord(event, url, item, options) {
+  saveRecord(event, url, item, column, options) {
     if (event) { event.stopPropagation(); }
     if (this.axios.isProcessing()) { return }
     if (!this.validateRecord(item)) { return }
@@ -847,7 +847,9 @@ class TfTable extends React.Component {
 
     let isNewItem = item.new_item === true;
 
-    return this.axios.post(url, {item: item}, {showLoader: true, defaultErrorHandler: false})
+    let saveData = {[column.saveDataKey ? column.saveDataKey : 'item']: item};
+
+    return this.axios.post(url, saveData, {showLoader: true, defaultErrorHandler: false})
       .then(({data}) => {
         if (options && typeof options.onSuccess === 'function') {
           options.onSuccess(data);
